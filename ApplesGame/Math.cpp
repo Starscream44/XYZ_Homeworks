@@ -41,4 +41,16 @@ namespace ApplesGame
 		sf::FloatRect spriteRect = sprite.getLocalBounds();
 		sprite.setOrigin(spriteRect.width * originX, spriteRect.height * originY);
 	}
+
+	sf::Vector2f OurVectorToSf(const Vector2D& v)
+	{
+		return sf::Vector2f(v.x, v.y);
+	}
+
+	sf::Vector2f GetSpriteScale(const sf::Sprite& sprite, const Vector2D& desiredSize)
+	{
+		const sf::Vector2u textureSize = sprite.getTexture()->getSize();
+		const sf::Vector2f spriteScale = { desiredSize.x / textureSize.x, desiredSize.y / textureSize.y };
+		return spriteScale;
+	}
 }

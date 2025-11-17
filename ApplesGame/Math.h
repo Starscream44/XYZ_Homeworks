@@ -1,4 +1,6 @@
 #pragma once
+#include <SFML/Graphics.hpp>
+
 namespace sf
 {
 	class Sprite;
@@ -16,6 +18,10 @@ namespace ApplesGame
 	};
 
 	typedef Vector2D Position2D;
+
+	sf::Vector2f OurVectorToSf(const Vector2D& v);
+	sf::Vector2f GetSpriteScale(const sf::Sprite& sprite, const Vector2D& desiredSize);
+
 
 	Position2D GetRandomPositionInScreen(float screenWidth, float screenHeight);
 

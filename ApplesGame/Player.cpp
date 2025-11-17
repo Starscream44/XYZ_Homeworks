@@ -19,7 +19,39 @@ namespace ApplesGame
 
 	void DrawPlayer(Player& player, sf::RenderWindow& window)
 	{
-		player.sprite.setPosition(player.position.x, player.position.y);
+		player.sprite.setPosition(OurVectorToSf(player.position));
+
+		const sf::Vector2f spriteScale = (GetSpriteScale(player.sprite, { PLAYER_SIZE, PLAYER_SIZE }));
+
+		// We need to rotate and flip sprite to match player direction
+		switch (player.direction)
+		{
+		case PlayerDirection::Up:
+		{
+			player.sprite.setScale(spriteScale.x, spriteScale.y);
+			player.sprite.setRotation(-90.f);
+			break;
+		}
+		case PlayerDirection::Right:
+		{
+			player.sprite.setScale(spriteScale.x, spriteScale.y);
+			player.sprite.setRotation(0.f);
+			break;
+		}
+		case PlayerDirection::Down:
+		{
+			player.sprite.setScale(spriteScale.x, spriteScale.y);
+			player.sprite.setRotation(90.f);
+			break;
+		}
+		case PlayerDirection::Left:
+		{
+			player.sprite.setScale(-spriteScale.x, spriteScale.y);
+			player.sprite.setRotation(0.f);
+			break;
+		}
+		}
+
 		window.draw(player.sprite);
 	}
 }
