@@ -132,7 +132,12 @@ namespace ApplesGame
 					game.eatSound.play();
 					game.apples[i].position = GetRandomPositionInScreen(SCREEN_WIDTH, SCREEN_HEIGHT);
 					++game.numEatenApples;
+					if (game.numEatenApples >= 10)
+					{
+						game.currentScreen = GameScreen::VICTORY;
+					}
 					game.player.speed += ACCELERATION;
+
 				}
 			}
 
@@ -143,6 +148,7 @@ namespace ApplesGame
 					game.rocks[i].position, { ROCK_SIZE, ROCK_SIZE }))
 				{
 					game.hitSound.play();
+					game.currentScreen = GameScreen::GAME_OVER;
 					game.isGameFinished = true;
 					game.timeSinceGameFinish = 0.f;
 				}
@@ -153,6 +159,7 @@ namespace ApplesGame
 				game.player.position.y - PLAYER_SIZE / 2.f < 0.f || game.player.position.y + PLAYER_SIZE / 2.f > SCREEN_HEIGHT)
 			{
 				game.hitSound.play();
+				game.currentScreen = GameScreen::GAME_OVER;
 				game.isGameFinished = true;
 				game.timeSinceGameFinish = 0.f;
 			}
@@ -263,11 +270,109 @@ namespace ApplesGame
 	}
 
 
-	void UpdateVictoryScreen(Game& game) {}
-	void DrawVictoryScreen(Game& game, sf::RenderWindow& window){}
+	void UpdateVictoryScreen(Game& game) 
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			game.mainMenuSelected = 0;
 
-	void UpdateGameOverScreen(Game& game) {}
-	void DrawGameOverScreen(Game& game, sf::RenderWindow& window){}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+			game.mainMenuSelected = 1;
+
+		// Enter
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+		{
+			if (game.mainMenuSelected == 0)
+			{
+				game.currentScreen = GameScreen::GAMEPLAY;
+				RestartGame(game);
+			}
+			else if (game.mainMenuSelected == 1)
+			{
+				exit(0);
+			}
+		}
+	
+	}
+	void DrawVictoryScreen(Game& game, sf::RenderWindow& window)
+	{
+		if (game.mainMenuSelected == 0)
+		{
+			game.menuButtonStart.setFillColor(sf::Color(100, 100, 100));
+			game.menuButtonExit.setFillColor(sf::Color(50, 50, 50));
+		}
+		else
+		{
+			game.menuButtonStart.setFillColor(sf::Color(50, 50, 50));
+			game.menuButtonExit.setFillColor(sf::Color(100, 100, 100));
+		}
+
+		// Заголовок "VICTORY" — пока можно без красивого текста
+		sf::Text title;
+		title.setFont(game.font);
+		title.setString("VICTORY!");
+		title.setCharacterSize(60);
+		title.setFillColor(sf::Color::White);
+		title.setPosition(200.f, 80.f);
+
+		window.draw(title);
+
+		window.draw(game.menuButtonStart);
+		window.draw(game.menuButtonExit);
+
+		window.draw(game.menuTextStart);
+		window.draw(game.menuTextExit);
+	}
+
+	void UpdateGameOverScreen(Game& game) 
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+			game.mainMenuSelected = 0;
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+			game.mainMenuSelected = 1;
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+		{
+			if (game.mainMenuSelected == 0)
+			{
+				game.currentScreen = GameScreen::GAMEPLAY;
+				RestartGame(game);
+			}
+			else if (game.mainMenuSelected == 1)
+			{
+				exit(0);
+			}
+		}
+	}
+	void DrawGameOverScreen(Game& game, sf::RenderWindow& window)
+	{
+		if (game.mainMenuSelected == 0)
+		{
+			game.menuButtonStart.setFillColor(sf::Color(100, 100, 100));
+			game.menuButtonExit.setFillColor(sf::Color(50, 50, 50));
+		}
+		else
+		{
+			game.menuButtonStart.setFillColor(sf::Color(50, 50, 50));
+			game.menuButtonExit.setFillColor(sf::Color(100, 100, 100));
+		}
+
+		// Заголовок
+		sf::Text title;
+		title.setFont(game.font);
+		title.setString("GAME OVER");
+		title.setCharacterSize(60);
+		title.setFillColor(sf::Color::Red);
+		title.setPosition(150.f, 80.f);
+
+		window.draw(title);
+
+		window.draw(game.menuButtonStart);
+		window.draw(game.menuButtonExit);
+
+		window.draw(game.menuTextStart);
+		window.draw(game.menuTextExit);
+	}
 
 	void InitMainMenu(Game& game)
 	{
