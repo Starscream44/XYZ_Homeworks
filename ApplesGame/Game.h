@@ -42,6 +42,9 @@ namespace ApplesGame
 		sf::SoundBuffer hitBuffer;
 		sf::Sound hitSound;
 		sf::Music backgroundMusic;
+		sf::Music menuMusic;
+		sf::Music gameOverMusic;
+		sf::Music winMusic;
 		sf::Texture startMenuTexture;
 		sf::Sprite startMenuSprite;
 
@@ -52,6 +55,7 @@ namespace ApplesGame
 		sf::Sprite winSprite;
 
 		GameScreen currentScreen = GameScreen::MAIN_MENU;
+		GameScreen previousScreen = (GameScreen)-1;
 
 		int mainMenuSelected = 0; 
 

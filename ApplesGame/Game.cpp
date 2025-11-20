@@ -58,10 +58,21 @@ namespace ApplesGame
 		game.hitSound.setBuffer(game.hitBuffer);
 
 
+		assert(game.menuMusic.openFromFile(RESOURCES_PATH + "\\Sounds/menu.wav"));
+		game.menuMusic.setLoop(true);
+		game.menuMusic.setVolume(30);
+
 		assert(game.backgroundMusic.openFromFile(RESOURCES_PATH + "\\Sounds/Background.wav"));
 		game.backgroundMusic.setLoop(true);
-		game.backgroundMusic.setVolume(25.f);
-		game.backgroundMusic.play();
+		game.backgroundMusic.setVolume(20);
+
+		assert(game.gameOverMusic.openFromFile(RESOURCES_PATH + "\\Sounds/loose.wav"));
+		game.gameOverMusic.setLoop(false);
+		game.gameOverMusic.setVolume(20);
+
+		assert(game.winMusic.openFromFile(RESOURCES_PATH + "\\Sounds/win.wav"));
+		game.winMusic.setLoop(false);     
+		game.winMusic.setVolume(20);
 
 
 		game.background.setSize(sf::Vector2f(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -76,6 +87,42 @@ namespace ApplesGame
 
 	void UpdateGame(Game& game, float deltaTime)
 	{
+		if (game.currentScreen != game.previousScreen)
+		{
+			switch (game.currentScreen)
+			{
+			case GameScreen::MAIN_MENU:
+				game.backgroundMusic.stop();
+				game.gameOverMusic.stop();
+				game.winMusic.stop();
+				game.menuMusic.play();
+				break;
+
+			case GameScreen::GAMEPLAY:
+				game.menuMusic.stop();
+				game.gameOverMusic.stop();
+				game.winMusic.stop();
+				game.backgroundMusic.play();
+				break;
+
+			case GameScreen::VICTORY:
+				game.menuMusic.stop();
+				game.backgroundMusic.stop();
+				game.gameOverMusic.stop();
+				game.winMusic.play();
+				break;
+
+			case GameScreen::GAME_OVER:
+				game.menuMusic.stop();
+				game.backgroundMusic.stop();
+				game.winMusic.stop();
+				game.gameOverMusic.play();
+				break;
+			}
+
+			game.previousScreen = game.currentScreen;
+		}
+
 
 		switch (game.currentScreen)
 		{
