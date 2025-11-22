@@ -61,9 +61,6 @@ using namespace ApplesGame;
 			window.display();
 		}
 
-		// Deinitialization
-		DeinializeGame(game);
-
 		return 0;
 	}
 

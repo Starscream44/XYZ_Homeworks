@@ -7,7 +7,6 @@
 namespace ApplesGame
 {
 
-
     void InitApple(Apple& apple, const Game& game)
     {
         bool valid = false;

@@ -34,25 +34,30 @@ namespace ApplesGame
 
 		//Resources
 		sf::Font font;
+
+
 		sf::Texture playerTexture;
 		sf::Texture appleTexture;
 		sf::Texture rockTexture;
-		sf::SoundBuffer eatBuffer;
-		sf::Sound eatSound;
-		sf::SoundBuffer hitBuffer;
-		sf::Sound hitSound;
-		sf::Music backgroundMusic;
-		sf::Music menuMusic;
-		sf::Music gameOverMusic;
-		sf::Music winMusic;
+
 		sf::Texture startMenuTexture;
 		sf::Sprite startMenuSprite;
 
 		sf::Texture gameOverTexture;
 		sf::Sprite gameOverSprite;
 
+
 		sf::Texture winTexture;
 		sf::Sprite winSprite;
+
+		sf::SoundBuffer eatBuffer;
+		sf::SoundBuffer hitBuffer;
+		sf::Sound eatSound;
+		sf::Sound hitSound;
+		sf::Music backgroundMusic;
+		sf::Music menuMusic;
+		sf::Music gameOverMusic;
+		sf::Music winMusic;
 
 		GameScreen currentScreen = GameScreen::MAIN_MENU;
 		GameScreen previousScreen = (GameScreen)-1;
@@ -61,8 +66,10 @@ namespace ApplesGame
 
 		sf::RectangleShape menuButtonStart;
 		sf::RectangleShape menuButtonExit;
+		sf::RectangleShape menuButtonRestart;
 
 		sf::Text menuTextStart;
+		sf::Text menuTextRestart;
 		sf::Text menuTextExit;
 	};
 
@@ -70,19 +77,4 @@ namespace ApplesGame
 	void InitGame(Game& game);
 	void UpdateGame(Game& game, float deltaTime);
 	void DrawGame(Game& game, sf::RenderWindow& window);
-	void DeinializeGame(Game& game);
-
-	void InitMainMenu(Game& game);
-
-	void UpdateMainMenu(Game& game);
-	void DrawMainMenu(Game& game, sf::RenderWindow& window);
-
-	void UpdateGameplay(Game& game, float deltaTime);
-	void DrawGameplay(Game& game, sf::RenderWindow& window);
-
-	void UpdateVictoryScreen(Game& game);
-	void DrawVictoryScreen(Game& game, sf::RenderWindow& window);
-
-	void UpdateGameOverScreen(Game& game);
-	void DrawGameOverScreen(Game& game, sf::RenderWindow& window);
 }
