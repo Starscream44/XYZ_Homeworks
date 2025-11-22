@@ -28,8 +28,6 @@ namespace ApplesGame
 		// Global game data
 		int numEatenApples = 0;
 		UIState uiState;
-		bool isGameFinished = false;
-		float timeSinceGameFinish = 0.f;
 		sf::RectangleShape background;
 
 		//Resources

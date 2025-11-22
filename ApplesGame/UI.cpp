@@ -16,22 +16,11 @@ namespace ApplesGame
 		uiState.inputHintText.setString("Use arrow keys to move! Eat 10 Apples");
 		uiState.inputHintText.setOrigin(GetTextOrigin(uiState.inputHintText, { 1.f, 0.f }));
 
-		uiState.isGameOverTextVisible = false;
-		uiState.gameOverText.setFont(font);
-		uiState.gameOverText.setCharacterSize(48);
-		uiState.gameOverText.setStyle(sf::Text::Bold);
-		uiState.gameOverText.setFillColor(sf::Color::Red);
-		uiState.gameOverText.setString("GAME OVER");
-		uiState.gameOverText.setOrigin(GetTextOrigin(uiState.gameOverText, { 0.5f, 0.5f }));
 	}
 
 	void UpdateUI(UIState& uiState, const struct Game& game, float timeDelta)
 	{
 		uiState.scoreText.setString("Apples eaten: " + std::to_string(game.numEatenApples));
-
-		uiState.isGameOverTextVisible = game.isGameFinished;
-		sf::Color gameOverTextColor = (int)game.timeSinceGameFinish % 2 ? sf::Color::Red : sf::Color::Yellow;
-		uiState.gameOverText.setFillColor(gameOverTextColor);
 	}
 
 	void DrawUI(UIState& uiState, sf::RenderWindow& window)
@@ -42,11 +31,6 @@ namespace ApplesGame
 		uiState.inputHintText.setPosition(window.getSize().x - 10.f, 10.f);
 		window.draw(uiState.inputHintText);
 
-		if (uiState.isGameOverTextVisible)
-		{
-			uiState.gameOverText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f);
-			window.draw(uiState.gameOverText);
-		}
 	}
 
 	void InitMainMenu(Game& game)

@@ -22,12 +22,11 @@ namespace ApplesGame
 		}
 
 		game.numEatenApples = 0;
-		game.isGameFinished = false;
-		game.timeSinceGameFinish = 0;
 	}
 
 	void InitGame(Game& game)
 	{
+		assert(game.font.loadFromFile(RESOURCES_PATH + "\\Fonts/Roboto-Regular.ttf"));
 		assert(game.playerTexture.loadFromFile(RESOURCES_PATH + "\\Pacman.png"));
 		assert(game.appleTexture.loadFromFile(RESOURCES_PATH + "\\Apple.png"));
 		assert(game.rockTexture.loadFromFile(RESOURCES_PATH + "\\Rock.png"));
@@ -50,8 +49,6 @@ namespace ApplesGame
 			float(SCREEN_WIDTH) / game.winTexture.getSize().x,
 			float(SCREEN_HEIGHT) / game.winTexture.getSize().y);
 
-
-		assert(game.font.loadFromFile(RESOURCES_PATH + "\\Fonts/Roboto-Regular.ttf"));
 		assert(game.eatBuffer.loadFromFile(RESOURCES_PATH +"\\Sounds/AppleEat.wav"));
 		game.eatSound.setBuffer(game.eatBuffer);
 		assert(game.hitBuffer.loadFromFile(RESOURCES_PATH +"\\Sounds/Crash.wav"));
@@ -145,9 +142,12 @@ namespace ApplesGame
 	}
 	void UpdateGameplay(Game & game, float deltaTime)
 	{ 
+		
 		// Update game state
-		if (!game.isGameFinished)
+		if (game.currentScreen == GameScreen::GAMEPLAY)
 		{
+			game.background.setFillColor(sf::Color::Black);
+
 			// Handle input
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			{
@@ -217,8 +217,6 @@ namespace ApplesGame
 				{
 					game.hitSound.play();
 					game.currentScreen = GameScreen::GAME_OVER;
-					game.isGameFinished = true;
-					game.timeSinceGameFinish = 0.f;
 				}
 			}
 
@@ -228,23 +226,6 @@ namespace ApplesGame
 			{
 				game.hitSound.play();
 				game.currentScreen = GameScreen::GAME_OVER;
-				game.isGameFinished = true;
-				game.timeSinceGameFinish = 0.f;
-			}
-		}
-		else
-		{
-			if (game.timeSinceGameFinish <= PAUSE_LENGTH)
-			{
-				game.timeSinceGameFinish += deltaTime;
-				game.background.setFillColor(sf::Color::Red);
-			}
-			else
-			{
-				// Reset backgound
-				game.background.setFillColor(sf::Color::Black);
-
-				RestartGame(game);
 			}
 		}
 		

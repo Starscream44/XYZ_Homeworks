@@ -5,11 +5,8 @@ namespace ApplesGame
 {
 	struct UIState
 	{
-		bool isGameOverTextVisible = false;
-
 		sf::Text scoreText;
 		sf::Text inputHintText;
-		sf::Text gameOverText;
 	};
 
 	void InitUI(UIState& uiState, const sf::Font& font);
