@@ -45,11 +45,23 @@ using namespace ApplesGame;
 					window.close();
 					break;
 				}
-				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+				if (event.type == sf::Event::KeyPressed &&
+					event.key.code == sf::Keyboard::Escape)
 				{
-					window.close();
+					if (game.isEnteringTarget)
+					{
+						// close target input popup
+						game.isEnteringTarget = false;
+						game.targetInput.clear();
+					}
+					else
+					{
+						// exit game
+						window.close();
+					}
 					break;
 				}
+				HandleEvent(game, event);
 			}
 
 			UpdateGame(game, deltaTime);

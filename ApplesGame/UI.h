@@ -26,6 +26,7 @@ namespace ApplesGame
 
 	void UpdateGameOverScreen(Game& game);
 	void DrawGameOverScreen(Game& game, sf::RenderWindow& window);
+	void InitModeSelect(Game& game);
 
 
 }

@@ -13,7 +13,7 @@ namespace ApplesGame
 		uiState.inputHintText.setFont(font);
 		uiState.inputHintText.setCharacterSize(24);
 		uiState.inputHintText.setFillColor(sf::Color::White);
-		uiState.inputHintText.setString("Use arrow keys to move! Eat 10 Apples");
+		uiState.inputHintText.setString("Use arrow keys to move!");
 		uiState.inputHintText.setOrigin(GetTextOrigin(uiState.inputHintText, { 1.f, 0.f }));
 
 	}
@@ -82,7 +82,8 @@ namespace ApplesGame
 		{
 			if (game.mainMenuSelected == 0)
 			{
-				game.currentScreen = GameScreen::GAMEPLAY;
+				game.currentScreen = GameScreen::MODE_SELECT;
+				game.ignoreInput = true;
 				RestartGame(game);
 			}
 			else if (game.mainMenuSelected == 1)
@@ -91,6 +92,7 @@ namespace ApplesGame
 			}
 		}
 	}
+
 	void DrawMainMenu(Game& game, sf::RenderWindow& window)
 	{
 		if (game.mainMenuSelected == 0)
@@ -125,8 +127,8 @@ namespace ApplesGame
 		{
 			if (game.mainMenuSelected == 0)
 			{
-				game.currentScreen = GameScreen::GAMEPLAY;
-				RestartGame(game);
+				game.currentScreen = GameScreen::MODE_SELECT;
+				game.mainMenuSelected = 0;
 			}
 			else if (game.mainMenuSelected == 1)
 			{
@@ -135,6 +137,7 @@ namespace ApplesGame
 		}
 
 	}
+
 	void DrawVictoryScreen(Game& game, sf::RenderWindow& window)
 	{
 		if (game.mainMenuSelected == 0)
@@ -169,8 +172,8 @@ namespace ApplesGame
 		{
 			if (game.mainMenuSelected == 0)
 			{
-				game.currentScreen = GameScreen::GAMEPLAY;
-				RestartGame(game);
+				game.currentScreen = GameScreen::MODE_SELECT;
+				game.mainMenuSelected = 0;
 			}
 			else if (game.mainMenuSelected == 1)
 			{
@@ -178,6 +181,7 @@ namespace ApplesGame
 			}
 		}
 	}
+
 	void DrawGameOverScreen(Game& game, sf::RenderWindow& window)
 	{
 		if (game.mainMenuSelected == 0)
@@ -197,6 +201,82 @@ namespace ApplesGame
 
 		window.draw(game.menuTextRestart);
 		window.draw(game.menuTextExit);
+	}
+
+	void InitModeSelect(Game& game)
+	{
+		const sf::Vector2f buttonSize(360.f, 60.f);
+		const float startY = 260.f;
+		const float spacing = 80.f;
+		const float centerX = 400.f;
+
+		// ---------- Finite apples ----------
+		game.modeButtonFinite.setSize(buttonSize);
+		game.modeButtonFinite.setOrigin(buttonSize.x / 2.f, buttonSize.y / 2.f);
+		game.modeButtonFinite.setPosition(centerX, startY);
+		game.modeButtonFinite.setFillColor(sf::Color(50, 50, 50));
+
+		game.modeTextFinite.setFont(game.font);
+		game.modeTextFinite.setString("Apples Target (5-30)");
+		game.modeTextFinite.setCharacterSize(24);
+		game.modeTextFinite.setFillColor(sf::Color::White);
+
+		sf::FloatRect textRect = game.modeTextFinite.getLocalBounds();
+		game.modeTextFinite.setOrigin(textRect.width / 2.f, textRect.height / 2.f);
+		game.modeTextFinite.setPosition(centerX, startY - 6.f);
+
+		// ---------- Endless ----------
+		game.modeButtonEndless.setSize(buttonSize);
+		game.modeButtonEndless.setOrigin(buttonSize.x / 2.f, buttonSize.y / 2.f);
+		game.modeButtonEndless.setPosition(centerX, startY + spacing);
+		game.modeButtonEndless.setFillColor(sf::Color(50, 50, 50));
+
+		game.modeTextEndless.setFont(game.font);
+		game.modeTextEndless.setString("Endless Score");
+		game.modeTextEndless.setCharacterSize(24);
+		game.modeTextEndless.setFillColor(sf::Color::White);
+
+		textRect = game.modeTextEndless.getLocalBounds();
+		game.modeTextEndless.setOrigin(textRect.width / 2.f, textRect.height / 2.f);
+		game.modeTextEndless.setPosition(centerX, startY + spacing - 6.f);
+
+		// ---------- Easy ----------
+		game.modeButtonEasy.setSize(buttonSize);
+		game.modeButtonEasy.setOrigin(buttonSize.x / 2.f, buttonSize.y / 2.f);
+		game.modeButtonEasy.setPosition(centerX, startY + spacing * 2.f);
+		game.modeButtonEasy.setFillColor(sf::Color(50, 50, 50));
+
+		game.modeTextEasy.setFont(game.font);
+		game.modeTextEasy.setString("Easy Mode (No Acceleration)");
+		game.modeTextEasy.setCharacterSize(24);
+		game.modeTextEasy.setFillColor(sf::Color::White);
+
+		textRect = game.modeTextEasy.getLocalBounds();
+		game.modeTextEasy.setOrigin(textRect.width / 2.f, textRect.height / 2.f);
+		game.modeTextEasy.setPosition(centerX, startY + spacing * 2.f - 6.f);
+
+		// ---------- Popup ----------
+		game.targetPopup.setSize(sf::Vector2f(420.f, 200.f));
+		game.targetPopup.setOrigin(210.f, 100.f);
+		game.targetPopup.setPosition(centerX, 300.f);
+		game.targetPopup.setFillColor(sf::Color(20, 20, 20, 220));
+
+		game.targetPopupTitle.setFont(game.font);
+		game.targetPopupTitle.setString("Enter apples to win (5-30)");
+		game.targetPopupTitle.setCharacterSize(22);
+		game.targetPopupTitle.setFillColor(sf::Color::White);
+		game.targetPopupTitle.setPosition(centerX - 170.f, 230.f);
+
+		game.targetPopupValue.setFont(game.font);
+		game.targetPopupValue.setCharacterSize(36);
+		game.targetPopupValue.setFillColor(sf::Color::Yellow);
+		game.targetPopupValue.setPosition(centerX - 20.f, 280.f);
+
+		game.targetPopupHint.setFont(game.font);
+		game.targetPopupHint.setString("Enter - confirm   Esc - cancel");
+		game.targetPopupHint.setCharacterSize(18);
+		game.targetPopupHint.setFillColor(sf::Color(150, 150, 150));
+		game.targetPopupHint.setPosition(centerX - 150.f, 340.f);
 	}
 
 }

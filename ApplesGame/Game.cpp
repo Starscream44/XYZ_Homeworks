@@ -78,6 +78,7 @@ namespace ApplesGame
 
 		InitUI(game.uiState, game.font);
 		InitMainMenu(game);
+		InitModeSelect(game);
 
 		RestartGame(game);
 	}
@@ -93,6 +94,10 @@ namespace ApplesGame
 				game.gameOverMusic.stop();
 				game.winMusic.stop();
 				game.menuMusic.play();
+				break;
+
+			case GameScreen::MODE_SELECT:
+				UpdateModeSelect(game, deltaTime);
 				break;
 
 			case GameScreen::GAMEPLAY:
@@ -140,9 +145,15 @@ namespace ApplesGame
 			break;
 		}
 	}
+
 	void UpdateGameplay(Game & game, float deltaTime)
 	{ 
-		
+		if (HasFlag(game.mode, GameModeFlags::FiniteTarget) &&
+			game.numEatenApples >= game.targetApplesToWin)
+		{
+			game.currentScreen = GameScreen::VICTORY;
+		}
+
 		// Update game state
 		if (game.currentScreen == GameScreen::GAMEPLAY)
 		{
@@ -200,11 +211,17 @@ namespace ApplesGame
 					game.eatSound.play();
 					game.apples[i].position = GetRandomPositionInScreen(SCREEN_WIDTH, SCREEN_HEIGHT);
 					++game.numEatenApples;
-					if (game.numEatenApples >= 10)
+
+					if (HasFlag(game.mode, GameModeFlags::FiniteTarget) &&
+						game.numEatenApples >= game.targetApplesToWin)
 					{
 						game.currentScreen = GameScreen::VICTORY;
 					}
-					game.player.speed += ACCELERATION;
+
+					if (!HasFlag(game.mode, GameModeFlags::NoAcceleration))
+					{
+						game.player.speed += ACCELERATION;
+					}
 
 				}
 			}
@@ -232,6 +249,93 @@ namespace ApplesGame
 		UpdateUI(game.uiState, game, deltaTime);
 	}
 
+	void HandleEvent(Game& game, const sf::Event& event)
+	{
+		if (game.currentScreen != GameScreen::MODE_SELECT)
+			return;
+
+
+		if (game.isEnteringTarget)
+		{
+			if (event.type == sf::Event::TextEntered)
+			{
+				const uint32_t ch = event.text.unicode;
+
+				if (ch >= '0' && ch <= '9')
+				{
+					if (game.targetInput.size() < 2)
+						game.targetInput.push_back((char)ch);
+				}
+				else if (ch == 8) // Backspace
+				{
+					if (!game.targetInput.empty())
+						game.targetInput.pop_back();
+				}
+			}
+
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter)
+			{
+				if (game.targetInput.empty())
+					return;
+
+				int value = std::stoi(game.targetInput);
+
+				if (value < 5 || value > 30)
+					return;
+
+				game.targetApplesToWin = value;
+				game.mode = GameModeFlags::FiniteTarget;
+
+				game.isEnteringTarget = false;
+				RestartGame(game);
+				game.currentScreen = GameScreen::GAMEPLAY;
+			}
+
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+			{
+				game.isEnteringTarget = false;
+			}
+
+			return;
+		}
+
+		
+		if (event.type == sf::Event::KeyPressed)
+		{
+			if (event.key.code == sf::Keyboard::Up)
+				game.modeMenuIndex = (game.modeMenuIndex + 2) % 3;
+
+			if (event.key.code == sf::Keyboard::Down)
+				game.modeMenuIndex = (game.modeMenuIndex + 1) % 3;
+
+			if (event.key.code == sf::Keyboard::Enter)
+			{
+				if (game.modeMenuIndex == 0) // Finite
+				{
+					game.isEnteringTarget = true;
+					game.targetInput.clear();
+					return;
+				}
+
+				if (game.modeMenuIndex == 1) // Endless score
+				{
+					game.mode = GameModeFlags::EndlessScore;
+					RestartGame(game);
+					game.currentScreen = GameScreen::GAMEPLAY;
+					return;
+				}
+
+				if (game.modeMenuIndex == 2) // Easy (no acceleration)
+				{
+					game.mode = GameModeFlags::EndlessScore | GameModeFlags::NoAcceleration;
+					RestartGame(game);
+					game.currentScreen = GameScreen::GAMEPLAY;
+					return;
+				}
+			}
+		}
+	}
+
 	void DrawGame(Game& game, sf::RenderWindow& window)
 	{
 
@@ -239,6 +343,9 @@ namespace ApplesGame
 		{
 		case GameScreen::MAIN_MENU:
 			DrawMainMenu(game, window);
+			break;
+		case GameScreen::MODE_SELECT:
+			DrawModeSelect(game, window);
 			break;
 		case GameScreen::GAMEPLAY:
 			DrawGameplay(game, window);
@@ -251,6 +358,7 @@ namespace ApplesGame
 			break;
 		}
 	}
+
 	void DrawGameplay(Game & game, sf::RenderWindow & window)
 	{ 
 		window.draw(game.background);
@@ -267,5 +375,129 @@ namespace ApplesGame
 		}
 		DrawUI(game.uiState, window);
 
+	}
+
+	void UpdateModeSelect(Game& game, float deltaTime)
+	{
+		static bool wasUp = false;
+		static bool wasDown = false;
+		static bool wasEnter = false;
+		static bool wasEsc = false;
+
+		const bool upNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+		const bool downNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+		const bool enterNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Enter);
+		const bool escNow = sf::Keyboard::isKeyPressed(sf::Keyboard::Escape);
+
+		if (game.ignoreInput)
+		{
+			
+			if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+			{
+				game.ignoreInput = false;
+			}
+			return;
+		}
+
+	
+		if (game.isEnteringTarget)
+		{
+			if (escNow && !wasEsc)
+			{
+				game.isEnteringTarget = false;
+				game.targetInput.clear();
+			}
+
+			wasUp = upNow;
+			wasDown = downNow;
+			wasEnter = enterNow;
+			wasEsc = escNow;
+			return;
+		}
+
+		
+		if (upNow && !wasUp)
+		{
+			game.modeMenuIndex = (game.modeMenuIndex + 2) % 3;
+		}
+		if (downNow && !wasDown)
+		{
+			game.modeMenuIndex = (game.modeMenuIndex + 1) % 3;
+		}
+
+		
+		if (enterNow && !wasEnter)
+		{
+			if (game.modeMenuIndex == 0)
+			{
+				// Finite target-Open popup
+				game.isEnteringTarget = true;
+				game.targetInput.clear();
+			}
+			else if (game.modeMenuIndex == 1)
+			{
+				// Endless score
+				game.mode = GameModeFlags::EndlessScore;
+				game.isEnteringTarget = false;
+				game.targetInput.clear();
+
+				RestartGame(game);
+				game.currentScreen = GameScreen::GAMEPLAY;
+			}
+			else if (game.modeMenuIndex == 2)
+			{
+				// Easy: no acceleration + endless score
+				game.mode = GameModeFlags::EndlessScore | GameModeFlags::NoAcceleration;
+				game.isEnteringTarget = false;
+				game.targetInput.clear();
+
+				RestartGame(game);
+				game.currentScreen = GameScreen::GAMEPLAY;
+			}
+		}
+
+		if (escNow && !wasEsc)
+		{
+			game.currentScreen = GameScreen::MAIN_MENU;
+		}
+
+		wasUp = upNow;
+		wasDown = downNow;
+		wasEnter = enterNow;
+		wasEsc = escNow;
+	}
+
+	void DrawModeSelect(const Game& game, sf::RenderWindow& window)
+	{
+		auto SetButtonState = [](sf::RectangleShape& btn, bool selected)
+			{
+				btn.setFillColor(selected ? sf::Color(90, 90, 90) : sf::Color(50, 50, 50));
+			};
+
+		SetButtonState(const_cast<sf::RectangleShape&>(game.modeButtonFinite), game.modeMenuIndex == 0);
+		SetButtonState(const_cast<sf::RectangleShape&>(game.modeButtonEndless), game.modeMenuIndex == 1);
+		SetButtonState(const_cast<sf::RectangleShape&>(game.modeButtonEasy), game.modeMenuIndex == 2);
+
+		window.draw(game.startMenuSprite);
+		window.draw(game.modeButtonFinite);
+		window.draw(game.modeButtonEndless);
+		window.draw(game.modeButtonEasy);
+
+		window.draw(game.modeTextFinite);
+		window.draw(game.modeTextEndless);
+		window.draw(game.modeTextEasy);
+
+		// Apple target input popup
+		if (game.isEnteringTarget)
+		{
+			window.draw(game.targetPopup);
+			window.draw(game.targetPopupTitle);
+
+			sf::Text valueText = game.targetPopupValue;
+			valueText.setString(game.targetInput.empty() ? "_" : game.targetInput);
+			window.draw(valueText);
+
+			window.draw(game.targetPopupHint);
+		}
 	}
 }
