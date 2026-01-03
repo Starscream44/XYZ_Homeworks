@@ -6,6 +6,8 @@
 #include "Player.h"
 #include "Apple.h"
 #include "Rock.h"
+#include <string>
+#include <unordered_map>
 #include "UI.h"
 
 namespace ApplesGame
@@ -53,6 +55,8 @@ namespace ApplesGame
 		Rock rocks[NUM_ROCKS];
 		bool ignoreInput = false;
 		bool isPopupOpen = false;
+
+		std::unordered_map<std::string, int> leaderboard;
 
 		// Mode select UI
 		int modeMenuIndex = 0;          // 0..2 (Finite / Endless / Easy)
@@ -128,4 +132,6 @@ namespace ApplesGame
 	void HandleEvent(Game& game, const sf::Event& event);
 	void UpdateModeSelect(Game& game, float dt);
 	void DrawModeSelect(const Game& game, sf::RenderWindow& window);
+	void InitLeaderboard(Game& game);
+	void UpdatePlayerScore(Game& game, int playerScore);
 }

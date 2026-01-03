@@ -1,6 +1,7 @@
 #include "UI.h"
 #include "Game.h"
 #include <string>
+#include <map>
 
 namespace ApplesGame
 {
@@ -114,6 +115,53 @@ namespace ApplesGame
 		window.draw(game.menuTextExit);
 	}
 
+	static void DrawLeaderboard(const Game& game, sf::RenderWindow& window, float x, float y)
+	{
+		// score -> name
+		std::multimap<int, std::string, std::greater<int>> sorted;
+
+		for (auto it = game.leaderboard.begin(); it != game.leaderboard.end(); ++it)
+		{
+			const std::string& name = it->first;
+			int score = it->second;
+			sorted.insert(std::make_pair(score, name));
+		}
+
+		sf::Text title;
+		title.setFont(game.font);
+		title.setCharacterSize(26);
+		title.setFillColor(sf::Color::White);
+		title.setString("===== LEADERBOARD =====");
+		title.setPosition(x, y);
+		window.draw(title);
+
+		float lineY = y + 40.f;
+		int place = 1;
+
+		for (auto it = sorted.begin(); it != sorted.end() && place <= 10; ++it)
+		{
+			int score = it->first;
+			const std::string& name = it->second;
+
+			sf::Text row;
+			row.setFont(game.font);
+			row.setCharacterSize(22);
+			row.setFillColor(sf::Color::Yellow);
+
+			row.setString(
+				std::to_string(place) + ". " +
+				name + " ....... " +
+				std::to_string((int)score)
+			);
+
+			row.setPosition(x, lineY);
+			window.draw(row);
+
+			lineY += 28.f;
+			place++;
+		}
+	}
+
 	void UpdateVictoryScreen(Game& game)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -153,6 +201,15 @@ namespace ApplesGame
 
 
 		window.draw(game.winSprite);
+		sf::Text result;
+		result.setFont(game.font);
+		result.setCharacterSize(24);
+		result.setFillColor(sf::Color::White);
+		result.setString("Apples eaten: " + std::to_string(game.numEatenApples));
+		result.setPosition(60.f, 120.f);
+		window.draw(result);
+
+		DrawLeaderboard(game, window, 60.f, 160.f);
 		window.draw(game.menuButtonRestart);
 		window.draw(game.menuButtonExit);
 
@@ -196,6 +253,15 @@ namespace ApplesGame
 		}
 
 		window.draw(game.gameOverSprite);
+		sf::Text result;
+		result.setFont(game.font);
+		result.setCharacterSize(24);
+		result.setFillColor(sf::Color::White);
+		result.setString("Apples eaten: " + std::to_string(game.numEatenApples));
+		result.setPosition(60.f, 120.f);
+		window.draw(result);
+
+		DrawLeaderboard(game, window, 60.f, 160.f);
 		window.draw(game.menuButtonRestart);
 		window.draw(game.menuButtonExit);
 
@@ -278,6 +344,7 @@ namespace ApplesGame
 		game.targetPopupHint.setFillColor(sf::Color(150, 150, 150));
 		game.targetPopupHint.setPosition(centerX - 150.f, 340.f);
 	}
+
 
 }
 

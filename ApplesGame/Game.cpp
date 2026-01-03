@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <cassert>
 #include "constants.h"
+#include <random>
 
 namespace ApplesGame
 {
@@ -79,6 +80,7 @@ namespace ApplesGame
 		InitUI(game.uiState, game.font);
 		InitMainMenu(game);
 		InitModeSelect(game);
+		InitLeaderboard(game);
 
 		RestartGame(game);
 	}
@@ -120,6 +122,11 @@ namespace ApplesGame
 				game.winMusic.stop();
 				game.gameOverMusic.play();
 				break;
+			}
+
+			if (game.currentScreen == GameScreen::VICTORY || game.currentScreen == GameScreen::GAME_OVER)
+			{
+				UpdatePlayerScore(game, game.numEatenApples);
 			}
 
 			game.previousScreen = game.currentScreen;
@@ -499,5 +506,48 @@ namespace ApplesGame
 
 			window.draw(game.targetPopupHint);
 		}
+	}
+
+	void InitLeaderboard(Game& game)
+	{
+		game.leaderboard.clear();
+
+		static std::mt19937 rng{ std::random_device{}() };
+
+		auto RandInt = [&](int a, int b)
+			{
+				std::uniform_int_distribution<int> dist(a, b);
+				return dist(rng);
+			};
+
+		
+		int total = RandInt(5, 10);
+		int fakeCount = total - 1;
+
+		
+		static const std::string names[] = {
+			"Alice","Bob","Carol","Dave","Eve","Frank","Grace","Heidi","Ivan","Judy"
+		};
+
+		
+		for (int i = 0; i < fakeCount; i++)
+		{
+			std::string name = names[RandInt(0, 9)];
+			int score = RandInt(10, 150);
+
+			
+			if (name == "Player") { i--; continue; }
+
+			
+			game.leaderboard.insert({ name, score });
+		}
+
+		
+		game.leaderboard["Player"] = 0;
+	}
+
+	void UpdatePlayerScore(Game& game, int playerScore)
+	{
+		game.leaderboard["Player"] = playerScore;
 	}
 }
