@@ -52,6 +52,7 @@ namespace ApplesGame
 	{
 		Player player;
 		Apple apples[NUM_APPLES];
+		int numApplesOnField = NUM_APPLES;
 		Rock rocks[NUM_ROCKS];
 		bool ignoreInput = false;
 		bool isPopupOpen = false;

@@ -10,8 +10,11 @@ namespace ApplesGame
 	{
 		InitPlayer(game.player, game);
 
+		// Randomize how many apples exist on the field (inclusive range)
+		game.numApplesOnField = 10 + (rand() % (20 - 10 + 1));
+
 		// Init apples
-		for (int i = 0; i < NUM_APPLES; ++i)
+		for (int i = 0; i < game.numApplesOnField; ++i)
 		{
 			InitApple(game.apples[i],game);
 		}
@@ -210,7 +213,7 @@ namespace ApplesGame
 			}
 
 			// Find player collisions with apples
-			for (int i = 0; i < NUM_APPLES; ++i)
+			for (int i = 0; i < game.numApplesOnField; ++i)
 			{
 				if (IsCirclesCollide(game.player.position, PLAYER_SIZE / 2.f,
 					game.apples[i].position, APPLE_SIZE / 2.f))
@@ -371,7 +374,7 @@ namespace ApplesGame
 		window.draw(game.background);
 		DrawPlayer(game.player, window);
 
-		for (int i = 0; i < NUM_APPLES; ++i)
+		for (int i = 0; i < game.numApplesOnField; ++i)
 		{
 			DrawApple(game.apples[i], window);
 		}
